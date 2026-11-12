@@ -7,9 +7,13 @@ export interface Point {
 export interface Tile extends Point {
   terrain: Terrain;
 }
+export type StatusKind = "slow" | "burn" | "guard";
 export interface Status {
-  kind: "slow" | "burn" | "guard";
+  id: string;
+  kind: StatusKind;
+  source: string | null;
   turns: number;
+  amount: number;
 }
 export interface Unit extends Point {
   id: string;
@@ -55,6 +59,6 @@ export interface Skill {
   range: number;
   power: number;
   target: "enemy" | "ally" | "self";
-  status?: Status["kind"];
+  status?: StatusKind;
   description: string;
 }

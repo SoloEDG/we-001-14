@@ -6,4 +6,11 @@ export {
   armorValue,
   tickStatuses,
   statusNames,
+  statusRules,
+  statusKinds,
+  statusValue,
+  mergedStatuses,
+  applyStatus,
+  migrateUnit,
+  migrateBattle,
 } from "./lib/status";

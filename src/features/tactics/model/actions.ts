@@ -1,5 +1,6 @@
 import type { Battle, Point, Skill } from "../../../shared/types";
 import { findUnit } from "../../../shared/document";
+import { applyStatus } from "../../roster/lib/status";
 import { legalTargets } from "../lib/targeting";
 import { previewDamage } from "../lib/damage";
 export function moveUnit(b: Battle, id: string, path: Point[]) {
@@ -26,10 +27,7 @@ export function castSkill(
     s.target === "ally"
       ? Math.min(t.maxHp, t.hp + value)
       : Math.max(0, t.hp - value);
-  if (s.status && t.hp > 0) {
-    t.statuses = t.statuses.filter((v) => v.kind !== s.status);
-    t.statuses.push({ kind: s.status, turns: 2 });
-  }
+  if (s.status && t.hp > 0) applyStatus(t, s.status, u.id);
   u.acted = true;
   return value;
 }

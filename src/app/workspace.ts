@@ -2,7 +2,7 @@ import { computed, reactive, ref } from "vue";
 import type { Point, Terrain } from "../shared/types";
 import { clone, findUnit, key } from "../shared/document";
 import { reachable, terrainRules, paintTile } from "../features/terrain";
-import { moveBudget, armorValue, tickStatuses } from "../features/roster";
+import { moveBudget, armorValue, tickStatuses, statusNames } from "../features/roster";
 import {
   getSkill,
   legalTargets,
@@ -77,7 +77,11 @@ export function useWorkspace() {
           session,
           before,
           "skill",
-          `${u.name} → ${t.name} · ${s.name} ${value}`,
+          `${u.name} → ${t.name} · ${s.name} ${value}${
+            s.status && t.hp > 0
+              ? ` · 施加${statusNames[s.status]}（${u.name}）`
+              : ""
+          }`,
         );
         skill.value = "";
       } else {
@@ -102,12 +106,18 @@ export function useWorkspace() {
   function wait() {
     if (locked.value) return;
     const before = clone(session.live);
-    finishTurn(session.live, tickStatuses);
+    let burned = 0;
+    finishTurn(session.live, (u) => {
+      burned = tickStatuses(u);
+    });
+    const actorName = findUnit(before, before.active).name;
     record(
       session,
       before,
       "wait",
-      `${findUnit(before, before.active).name}结束行动`,
+      burned
+        ? `${actorName}结束行动 · 灼烧结算 ${burned}`
+        : `${actorName}结束行动`,
     );
     selected.value = session.live.active;
     skill.value = "";
